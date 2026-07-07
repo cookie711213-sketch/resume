@@ -1031,7 +1031,7 @@
       <p class="kicker">Career</p>
       <h2 class="section__title">경력 요약</h2>
       <p class="section__desc">
-        사내 유일한 개발자로 1년 넘게 전사 시스템을 직접 책임지고 운영해 온,
+        사내 유일한 개발자로 전사 시스템을 직접 책임지고 운영해 온 2년차 개발자로,
         즉시 투입 가능한 실무자입니다.
       </p>
     </div>
@@ -1041,7 +1041,7 @@
         <p class="career__period">2025.05 — 현재</p>
         <h3 class="career__org">청암 / 청암홈윈도우 · 대리</h3>
         <div class="career__badges">
-          <span class="career__badge">사내 유일 개발자 · 1년+ 실무</span>
+          <span class="career__badge">사내 유일 개발자 · 2년차</span>
           <span class="career__badge">기획 → 설계 → 운영 단독 책임</span>
           <span class="career__badge">현업 요청 → 개발 Spec 구조화</span>
           <span class="career__badge">프로세스 기반 품질 관리</span>
@@ -1050,7 +1050,7 @@
       </div>
       <div class="career__body">
         <p>
-          2025년 5월 청암에 입사해(약 1년+ 재직 중), 그룹의 B2C 사업을 담당하는
+          2025년 5월 청암에 입사해(현재 2년차), 그룹의 B2C 사업을 담당하는
           청암홈윈도우의 사내 시스템 개발을 전담하고 있습니다. 회사의 유일한
           개발자로서, 초기에는 RPA·크롤링·OCR로 수기 업무를 자동화하고 1세대
           시스템인 CRM을 운영·고도화하며 고객·계약·실측·시공·수금·정산·AS의 업무
@@ -1249,6 +1249,7 @@
             <span class="tag">pnpm 모노레포</span>
             <span class="tag">Cloudflare Pages (Edge)</span>
             <span class="tag">Vitest + Playwright</span>
+            <span class="tag">텔레그램 봇 · 미니앱</span>
           </div>
         </div>
 
@@ -1298,21 +1299,32 @@
             </li>
             <li>
               <span class="contrib__idx">08</span>
+              <span><strong>상담배정 '입찰선점' 시스템 구축</strong> — 홈페이지 유입
+                고객을 상담원 수동 배정 없이 권역 담당 영업팀장 전원에게
+                텔레그램으로 즉시 공고, 선착순 선점(동시 클릭도 1명만 통과하는
+                원자적 처리)으로 연결하는 리드 배정 시스템. 선점 전 전화번호
+                마스킹, 30분 미선점 리마인더·3시간 미통화 자동 회수 크론, 텔레그램
+                미니앱 기반 고객정보 입력·권역 자동판정 반환, 팀장별
+                선점·이행·전환율 통계까지 구성 — 상담원 3명이 하던 1차 전화·배정
+                업무를 시스템이 대체하도록 설계</span>
+            </li>
+            <li>
+              <span class="contrib__idx">09</span>
               <span>순수함수 가격 엔진(formulaVersion 박제 + 골든테스트 회귀
                 방지)</span>
             </li>
             <li>
-              <span class="contrib__idx">09</span>
+              <span class="contrib__idx">10</span>
               <span>GitHub Actions cron → Cloudflare Workers Cron 마이그레이션(21개
                 자동화)</span>
             </li>
             <li>
-              <span class="contrib__idx">10</span>
+              <span class="contrib__idx">11</span>
               <span>자체 보안 리뷰로 P0 취약점 도출·조치(Firestore rules 3,099줄
                 역할 기반 권한)</span>
             </li>
             <li>
-              <span class="contrib__idx">11</span>
+              <span class="contrib__idx">12</span>
               <span><strong>개발 생산성 정량 평가 시스템 설계</strong> — 머지 PR을
                 3축으로 자동 채점하는 순수함수 엔진 + 적재 파이프라인 + 평가
                 대시보드 (상세는 핵심 역량 참조)</span>
@@ -1325,20 +1337,6 @@
             <div class="ts-grid">
               <div class="ts-card">
                 <span class="ts-card__num">①</span>
-                <p class="ts-card__title">
-                  "캘린더가 느리다" 한 줄 피드백 → 조회 경로 재설계
-                </p>
-                <p class="ts-card__body">
-                  "캘린더가 느리다"는 한 줄 피드백을 운영 데이터로 파고들어, 화면
-                  진입 때 일정과 무관한 과거 고객·시공 데이터를 함께 읽던 접근
-                  패턴을 원인으로 규명. 검색 가능한 날짜 필드를 정리하고 월 범위
-                  쿼리 중심으로 조회 경로를 바꿔, 필요한 기간의 일정만 읽도록
-                  개선했습니다. 다음 이관에도 같은 규칙이 적용되도록 스크립트에
-                  날짜 보정 규칙을 반영해 재발 가능성까지 줄였습니다.
-                </p>
-              </div>
-              <div class="ts-card">
-                <span class="ts-card__num">②</span>
                 <p class="ts-card__title">
                   NoSQL 정합성을 전면 전환 없이 설계로 메우기
                 </p>
@@ -1354,7 +1352,7 @@
                 </p>
               </div>
               <div class="ts-card">
-                <span class="ts-card__num">③</span>
+                <span class="ts-card__num">②</span>
                 <p class="ts-card__title">
                   공식 API가 없는 타 부서 시스템 연동 돌파
                 </p>
