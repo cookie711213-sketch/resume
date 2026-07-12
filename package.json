@@ -1,0 +1,17 @@
+{
+  "name": "resume-cv",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "test:content": "node --test tests/content.test.mjs tests/site-build.test.mjs",
+    "test:browser": "playwright test tests/responsive.spec.mjs",
+    "pdf": "node scripts/render-pdf.mjs",
+    "test:pdf": "node --test tests/print.test.mjs",
+    "test": "npm run test:content && npm run test:browser && npm run test:pdf",
+    "verify": "npm test && npm run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}
