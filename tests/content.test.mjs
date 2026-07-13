@@ -21,6 +21,9 @@ const REQUIRED_COPY = [
   '1원 단위 불일치',
   'CRM 운영·고도화 및 주요 기능 개발',
   '개발 인력 1명 환경',
+  '포인스 공동창업 · 2020 · 예비창업패키지 선정 및 게임 프로토타입 기획·개발',
+  '한국피엘에이 · 물류 운영 · 2020.12–2022.05',
+  '극동전자정밀 · 제조 공정 · 2016.03–2018.05',
 ];
 
 const FORBIDDEN_COPY = [
@@ -44,6 +47,8 @@ const FORBIDDEN_COPY = [
   '전 도메인 단독',
   '전사 목록을 500→30',
   '단독 설계',
+  '대한민국 육군 병참',
+  'Poins 공동창업',
 ];
 
 async function getRenderedText(source, selector = 'body') {

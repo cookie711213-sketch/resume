@@ -114,7 +114,7 @@
       letter-spacing: .04em;
     }
 
-    h1 {
+    .hero-role {
       max-width: 760px;
       margin: 0;
       font-size: clamp(2.25rem, 5.2vw, 4.5rem);
@@ -400,6 +400,10 @@
       object-position: center 42%;
     }
 
+    .project-card:nth-child(2) .project-image {
+      object-position: center 15%;
+    }
+
     .project-content {
       padding: 25px 26px 27px;
     }
@@ -572,8 +576,8 @@
 
       body {
         color: #18211d;
-        font-size: 8.5pt;
-        line-height: 1.3;
+        font-size: 9.1pt;
+        line-height: 1.34;
         letter-spacing: -.012em;
         word-break: keep-all;
       }
@@ -591,7 +595,7 @@
       }
 
       .hero {
-        padding: 0 0 3.5mm;
+        padding: 0 0 5mm;
         border-bottom: 1px solid var(--line);
       }
 
@@ -604,16 +608,16 @@
       .eyebrow,
       .section-label,
       .card-label {
-        font-size: 7pt;
+        font-size: 7.5pt;
         letter-spacing: .12em;
       }
 
       .hero-name {
         margin: 2.5mm 0 .5mm;
-        font-size: 9pt;
+        font-size: 9.2pt;
       }
 
-      h1 {
+      .hero-role {
         max-width: none;
         font-size: 19pt;
         line-height: 1.04;
@@ -621,14 +625,14 @@
 
       .hero-statement {
         margin: 3mm 0 1.5mm;
-        font-size: 11pt;
+        font-size: 11.5pt;
         line-height: 1.3;
       }
 
       .hero-intro {
         max-width: none;
-        font-size: 8.4pt;
-        line-height: 1.35;
+        font-size: 9pt;
+        line-height: 1.4;
       }
 
       .hero-aside {
@@ -637,7 +641,7 @@
 
       .hero-aside p {
         margin-bottom: 2mm;
-        font-size: 7pt;
+        font-size: 7.5pt;
       }
 
       .hero-links {
@@ -647,15 +651,15 @@
 
       .hero-links a {
         color: var(--ink);
-        font-size: 8.4pt;
+        font-size: 9pt;
         font-weight: 650;
         text-decoration: none;
       }
 
       .metrics {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 2mm;
-        margin-top: 3.5mm;
+        gap: 2.8mm;
+        margin-top: 5mm;
       }
 
       .metric-card,
@@ -669,17 +673,17 @@
       }
 
       .metric-card {
-        padding: 2.5mm 3mm;
+        padding: 3.5mm 4mm;
       }
 
       .metric-card strong {
-        margin-bottom: .8mm;
-        font-size: 12pt;
+        margin-bottom: 1mm;
+        font-size: 12.5pt;
       }
 
       .metric-card span {
-        font-size: 8.4pt;
-        line-height: 1.25;
+        font-size: 9pt;
+        line-height: 1.3;
       }
 
       main.resume-shell {
@@ -687,8 +691,13 @@
       }
 
       section {
-        padding: 4mm 0;
+        padding: 7mm 0;
         border-top: 1px solid var(--line);
+      }
+
+      #projects,
+      #background {
+        padding-block: 8mm;
       }
 
       #experience {
@@ -697,23 +706,23 @@
 
       .section-heading {
         grid-template-columns: 35mm minmax(0, 1fr);
-        gap: 4mm;
-        margin-bottom: 2.5mm;
+        gap: 5mm;
+        margin-bottom: 4mm;
       }
 
       .section-title {
         margin-top: 1mm;
-        font-size: 13pt;
+        font-size: 14pt;
       }
 
       .section-summary {
-        font-size: 8.4pt;
-        line-height: 1.3;
+        font-size: 9pt;
+        line-height: 1.4;
       }
 
       .experience-row {
         grid-template-columns: 38mm minmax(0, 1fr);
-        gap: 4mm;
+        gap: 5mm;
       }
 
       .experience-meta h3 {
@@ -722,54 +731,54 @@
       }
 
       .experience-meta p {
-        font-size: 8.4pt;
+        font-size: 9pt;
       }
 
       .experience-scope {
-        margin-bottom: 1.5mm;
-        font-size: 8.5pt;
+        margin-bottom: 2.2mm;
+        font-size: 9.1pt;
       }
 
       .bullet-list {
-        gap: .8mm;
+        gap: 1.2mm;
         padding-left: 4mm;
       }
 
       .bullet-list li {
         padding-left: .5mm;
-        font-size: 8.4pt;
-        line-height: 1.28;
+        font-size: 9pt;
+        line-height: 1.34;
       }
 
       .case-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 2mm;
+        gap: 3mm;
       }
 
       .case-card {
-        padding: 2.5mm;
+        padding: 3.5mm;
         break-inside: avoid;
       }
 
       .case-card h3 {
-        margin: 1.2mm 0 .8mm;
-        font-size: 9.2pt;
+        margin: 1.5mm 0 1mm;
+        font-size: 9.8pt;
       }
 
       .card-stack {
         min-height: 0;
-        margin-bottom: 1.2mm;
-        font-size: 7pt;
+        margin-bottom: 1.6mm;
+        font-size: 7.8pt;
         line-height: 1.3;
       }
 
       .case-card .bullet-list {
-        gap: 1mm;
+        gap: 1.5mm;
       }
 
       .case-card .bullet-list li {
-        font-size: 8.4pt;
-        line-height: 1.26;
+        font-size: 9pt;
+        line-height: 1.32;
       }
 
       #skills {
@@ -780,34 +789,34 @@
 
       .skills-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 1.5mm;
+        gap: 2.4mm;
       }
 
       .skill-group {
-        padding: 2mm;
+        padding: 3mm;
       }
 
       .skill-group h3 {
-        margin-bottom: 1.2mm;
-        font-size: 8.4pt;
+        margin-bottom: 1.6mm;
+        font-size: 9pt;
       }
 
       .skill-list {
-        gap: 1mm;
+        gap: 1.4mm;
       }
 
       .skill-chip {
-        padding: 1mm 1.5mm;
+        padding: 1.4mm 1.8mm;
         background: transparent;
         border: 1px solid var(--line);
         border-radius: 0;
-        font-size: 7.4pt;
-        line-height: 1.2;
+        font-size: 8.4pt;
+        line-height: 1.25;
       }
 
       .project-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 2mm;
+        gap: 3mm;
       }
 
       .project-card {
@@ -815,45 +824,45 @@
       }
 
       .project-content {
-        padding: 2.5mm 3mm;
+        padding: 3.8mm 4mm;
       }
 
       .project-card h3 {
-        margin: 1mm 0 .7mm;
-        font-size: 10pt;
+        margin: 1.4mm 0 1mm;
+        font-size: 10.5pt;
       }
 
       .project-meta {
-        margin-bottom: 1mm;
-        font-size: 7.4pt;
+        margin-bottom: 1.5mm;
+        font-size: 8.4pt;
       }
 
       .project-card .bullet-list {
-        gap: .6mm;
+        gap: 1.1mm;
       }
 
       .background-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.5mm;
+        gap: 2.5mm;
       }
 
       .background-card {
-        padding: 2mm 2.5mm;
+        padding: 3.5mm 4mm;
         break-inside: avoid;
       }
 
       .background-card h3 {
-        margin-bottom: 1mm;
-        font-size: 8.6pt;
+        margin-bottom: 1.5mm;
+        font-size: 9.2pt;
       }
 
       .background-card p {
-        font-size: 8.4pt;
-        line-height: 1.25;
+        font-size: 9pt;
+        line-height: 1.35;
       }
 
       .background-card p + p {
-        margin-top: 1mm;
+        margin-top: 1.5mm;
       }
 
       .section-heading,
@@ -864,7 +873,7 @@
       }
 
       footer {
-        padding: 2.5mm 0 0;
+        padding: 3.5mm 0 0;
         color: var(--muted);
         background: transparent;
         border-top: 1px solid var(--line);
@@ -874,7 +883,7 @@
       footer p,
       footer a {
         color: var(--muted);
-        font-size: 7.5pt;
+        font-size: 8.4pt;
       }
     }
   </style>
@@ -887,8 +896,8 @@
       <div class="hero-grid">
         <div>
           <p class="eyebrow">ERP · CRM · 업무자동화</p>
-          <p class="hero-name">이승환</p>
-          <h1>ERP·CRM 백엔드 중심 풀스택 개발자</h1>
+          <h1 class="hero-name">이승환</h1>
+          <p class="hero-role">ERP·CRM 백엔드 중심 풀스택 개발자</p>
           <p class="hero-statement">현업의 복잡한 업무 흐름을 운영 가능한 시스템으로 만듭니다.</p>
           <p class="hero-intro">2025.05부터 창호 시공업 B2C 사업에서 Kotlin/Spring Boot와 Next.js를 기반으로 ERP·CRM을 개발·운영하고 있습니다. 레거시 마이그레이션과 Python 업무자동화, AWS/GCP/Firebase 운영을 수행하며 현업 요구를 권한·상태·예외 기준으로 구조화해 구현합니다.</p>
         </div>
@@ -1120,9 +1129,9 @@
         </article>
         <article class="background-card">
           <h3>이전 경험</h3>
-          <p><strong>Poins 공동창업</strong> · 2020 예비창업패키지, 게임 프로토타입 기획·개발</p>
-          <p><strong>대한민국 육군 병참</strong> · 2020.12–2022.05</p>
-          <p><strong>극동전자정밀 제조</strong> · 2016.03–2018.05</p>
+          <p><strong>포인스 공동창업</strong> · 2020 · 예비창업패키지 선정 및 게임 프로토타입 기획·개발</p>
+          <p><strong>한국피엘에이</strong> · 물류 운영 · 2020.12–2022.05</p>
+          <p><strong>극동전자정밀</strong> · 제조 공정 · 2016.03–2018.05</p>
         </article>
       </div>
     </section>
