@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
-    "linkedom": "^0.18.13"
+    "linkedom": "^0.18.13",
+    "wrangler": "4.110.0"
   }
 }
