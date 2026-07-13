@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { chromium } from '@playwright/test';
 import {
-  getVisibleElements,
-  getVisibleText,
+  getElements,
   parseResumeDocument,
 } from './content-contract.mjs';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const document = parseResumeDocument(html);
-const text = getVisibleText(document);
+let browser;
+let text;
 
 const REQUIRED_COPY = [
   'ERP·CRM 백엔드 중심 풀스택 개발자',
@@ -45,6 +46,26 @@ const FORBIDDEN_COPY = [
   '단독 설계',
 ];
 
+async function getRenderedText(source, selector = 'body') {
+  const page = await browser.newPage();
+  try {
+    await page.setContent(source, { waitUntil: 'domcontentloaded' });
+    const rendered = await page.locator(selector).innerText();
+    return rendered.replace(/\s+/g, ' ').trim();
+  } finally {
+    await page.close();
+  }
+}
+
+test.before(async () => {
+  browser = await chromium.launch({ headless: true });
+  text = await getRenderedText(html);
+});
+
+test.after(async () => {
+  await browser?.close();
+});
+
 test('contains every approved positioning and evidence statement', () => {
   const missing = REQUIRED_COPY.filter((copy) => !text.includes(copy));
   assert.deepEqual(missing, [], `Missing approved copy: ${missing.join(', ')}`);
@@ -77,7 +98,7 @@ test('uses exactly one unique email target', () => {
 });
 
 test('uses the approved five-section information architecture in order', () => {
-  const sectionIds = getVisibleElements(document, 'section[id]').map((element) => element.id);
+  const sectionIds = getElements(document, 'section[id]').map((element) => element.id);
   assert.deepEqual(sectionIds, ['experience', 'cases', 'skills', 'projects', 'background']);
 });
 
@@ -88,9 +109,9 @@ test('contains no duplicate element IDs', () => {
 });
 
 test('limits project and skill-card density', () => {
-  assert.equal(getVisibleElements(document, '.project-card').length, 2);
+  assert.equal(getElements(document, '.project-card').length, 2);
   assert.ok(
-    getVisibleElements(document, '.skill-chip').length <= 20,
+    getElements(document, '.skill-chip').length <= 20,
     'Expected no more than 20 skill-chip elements',
   );
 });
@@ -105,27 +126,32 @@ test('removes superseded strengths and about sections', () => {
   assert.equal(document.getElementById('about-me'), null);
 });
 
-test('describes the current company as a window-construction B2C business', () => {
+test('describes the current company as a window-construction B2C business', async () => {
   assert.ok(text.includes('창호 시공업 B2C 사업'));
-  const [experience] = getVisibleElements(document, 'section#experience');
+  const [experience] = getElements(document, 'section#experience');
   assert.ok(experience, 'Missing current-company experience section');
-  assert.doesNotMatch(getVisibleText(experience), /\bB2B\b/i);
+  assert.doesNotMatch(await getRenderedText(html, 'section#experience'), /\bB2B\b/i);
 });
 
-test('DOM contract ignores non-rendered copy and elements', () => {
-  const fixture = parseResumeDocument(`<!doctype html><html><head>
-    <style>.decoy::before { content: "424K ERP·CRM 백엔드 중심 풀스택 개발자"; }</style>
+test('rendered-copy contract follows browser visibility', async () => {
+  const fixture = `<!doctype html><html><head>
+    <style>
+      .decoy::before { content: "424K ERP·CRM 백엔드 중심 풀스택 개발자"; }
+      .css-hidden { display: none; }
+    </style>
     <script>const decoy = "424K ERP·CRM 백엔드 중심 풀스택 개발자";</script>
   </head><body>
     <!-- <section id="experience" class="project-card">424K ERP·CRM 백엔드 중심 풀스택 개발자</section> -->
     <template><section id="cases" class="project-card">424K ERP·CRM 백엔드 중심 풀스택 개발자</section></template>
     <section id="skills" class="project-card" hidden>424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
-    <section id="projects" class="project-card" aria-hidden="true">424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
     <section id="background" class="project-card" style="display: none">424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
+    <p class="css-hidden">stylesheet-hidden copy</p>
+    <p aria-hidden="true">aria-hidden but visually rendered copy</p>
     <p>visible control copy</p>
-  </body></html>`);
+  </body></html>`;
 
-  assert.equal(getVisibleText(fixture), 'visible control copy');
-  assert.deepEqual(getVisibleElements(fixture, 'section[id]').map((element) => element.id), []);
-  assert.equal(getVisibleElements(fixture, '.project-card').length, 0);
+  assert.equal(
+    await getRenderedText(fixture),
+    'aria-hidden but visually rendered copy visible control copy',
+  );
 });
