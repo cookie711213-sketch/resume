@@ -1,8 +1,15 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import {
+  getVisibleElements,
+  getVisibleText,
+  parseResumeDocument,
+} from './content-contract.mjs';
 
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const document = parseResumeDocument(html);
+const text = getVisibleText(document);
 
 const REQUIRED_COPY = [
   'ERP·CRM 백엔드 중심 풀스택 개발자',
@@ -38,39 +45,18 @@ const FORBIDDEN_COPY = [
   '단독 설계',
 ];
 
-function visibleText(source) {
-  return source
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<(?:style|script)\b[^>]*>[\s\S]*?<\/(?:style|script)>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function attributeValues(name) {
-  const expression = new RegExp(`\\b${name}\\s*=\\s*(["'])(.*?)\\1`, 'gis');
-  return [...html.matchAll(expression)].map((match) => match[2]);
-}
-
-function classCount(className) {
-  return attributeValues('class').reduce((count, value) => {
-    return count + value.split(/\s+/).filter((token) => token === className).length;
-  }, 0);
-}
-
 test('contains every approved positioning and evidence statement', () => {
-  const missing = REQUIRED_COPY.filter((copy) => !html.includes(copy));
+  const missing = REQUIRED_COPY.filter((copy) => !text.includes(copy));
   assert.deepEqual(missing, [], `Missing approved copy: ${missing.join(', ')}`);
 });
 
 test('removes every disallowed legacy claim', () => {
-  const present = FORBIDDEN_COPY.filter((copy) => html.includes(copy));
+  const present = FORBIDDEN_COPY.filter((copy) => text.includes(copy));
   assert.deepEqual(present, [], `Legacy claims still present: ${present.join(', ')}`);
 });
 
 test('publishes no telephone or birth-date PII', () => {
+  // Source-level by design: hidden PII is still downloadable in the public HTML.
   const violations = [];
   if (/\bhref\s*=\s*(["'])tel:[^"']*\1/i.test(html)) violations.push('tel href');
   if (/\b(?:\+?82[-.\s]?)?0?10[-.\s]?\d{3,4}[-.\s]?\d{4}\b/.test(html)) {
@@ -83,42 +69,63 @@ test('publishes no telephone or birth-date PII', () => {
 });
 
 test('uses exactly one unique email target', () => {
-  const targets = [...html.matchAll(/\bhref\s*=\s*(["'])mailto:([^?"']+)(?:\?[^"']*)?\1/gi)]
-    .map((match) => decodeURIComponent(match[2]).trim().toLowerCase());
+  const targets = [...document.querySelectorAll('a[href]')]
+    .map((element) => element.getAttribute('href'))
+    .filter((href) => /^mailto:/i.test(href))
+    .map((href) => decodeURIComponent(href.slice('mailto:'.length).split('?', 1)[0]).trim().toLowerCase());
   assert.equal(new Set(targets).size, 1);
 });
 
 test('uses the approved five-section information architecture in order', () => {
-  const sectionIds = [...html.matchAll(/<section\b[^>]*\bid\s*=\s*(["'])(.*?)\1[^>]*>/gis)]
-    .map((match) => match[2]);
+  const sectionIds = getVisibleElements(document, 'section[id]').map((element) => element.id);
   assert.deepEqual(sectionIds, ['experience', 'cases', 'skills', 'projects', 'background']);
 });
 
 test('contains no duplicate element IDs', () => {
-  const ids = attributeValues('id');
+  const ids = [...document.querySelectorAll('[id]')].map((element) => element.id);
   const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
   assert.deepEqual(duplicates, []);
 });
 
 test('limits project and skill-card density', () => {
-  assert.equal(classCount('project-card'), 2);
-  assert.ok(classCount('skill-chip') <= 20, 'Expected no more than 20 skill-chip elements');
+  assert.equal(getVisibleElements(document, '.project-card').length, 2);
+  assert.ok(
+    getVisibleElements(document, '.skill-chip').length <= 20,
+    'Expected no more than 20 skill-chip elements',
+  );
 });
 
 test('keeps only the approved one-person-team context', () => {
-  const claims = visibleText(html).match(/개발 인력 1명 환경|단독|유일|혼자|1인/g) ?? [];
+  const claims = text.match(/개발 인력 1명 환경|단독|유일|혼자|1인/g) ?? [];
   assert.deepEqual(claims, ['개발 인력 1명 환경']);
 });
 
 test('removes superseded strengths and about sections', () => {
-  assert.doesNotMatch(html, /core-strengths|about-me/i);
+  assert.equal(document.getElementById('core-strengths'), null);
+  assert.equal(document.getElementById('about-me'), null);
 });
 
 test('describes the current company as a window-construction B2C business', () => {
-  assert.ok(html.includes('창호 시공업 B2C 사업'));
-  const experience = html.match(
-    /<section\b(?=[^>]*\bid\s*=\s*(["'])experience\1)[^>]*>[\s\S]*?<\/section>/i,
-  );
+  assert.ok(text.includes('창호 시공업 B2C 사업'));
+  const [experience] = getVisibleElements(document, 'section#experience');
   assert.ok(experience, 'Missing current-company experience section');
-  assert.doesNotMatch(visibleText(experience[0]), /\bB2B\b/i);
+  assert.doesNotMatch(getVisibleText(experience), /\bB2B\b/i);
+});
+
+test('DOM contract ignores non-rendered copy and elements', () => {
+  const fixture = parseResumeDocument(`<!doctype html><html><head>
+    <style>.decoy::before { content: "424K ERP·CRM 백엔드 중심 풀스택 개발자"; }</style>
+    <script>const decoy = "424K ERP·CRM 백엔드 중심 풀스택 개발자";</script>
+  </head><body>
+    <!-- <section id="experience" class="project-card">424K ERP·CRM 백엔드 중심 풀스택 개발자</section> -->
+    <template><section id="cases" class="project-card">424K ERP·CRM 백엔드 중심 풀스택 개발자</section></template>
+    <section id="skills" class="project-card" hidden>424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
+    <section id="projects" class="project-card" aria-hidden="true">424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
+    <section id="background" class="project-card" style="display: none">424K ERP·CRM 백엔드 중심 풀스택 개발자</section>
+    <p>visible control copy</p>
+  </body></html>`);
+
+  assert.equal(getVisibleText(fixture), 'visible control copy');
+  assert.deepEqual(getVisibleElements(fixture, 'section[id]').map((element) => element.id), []);
+  assert.equal(getVisibleElements(fixture, '.project-card').length, 0);
 });

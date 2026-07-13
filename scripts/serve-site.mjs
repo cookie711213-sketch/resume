@@ -1,4 +1,4 @@
-import { readFile, stat } from 'node:fs/promises';
+import { lstat, readFile, realpath, stat } from 'node:fs/promises';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,13 +54,23 @@ export function createSiteServer({ siteRoot = defaultSiteRoot } = {}) {
     }
 
     try {
-      const fileStat = await stat(filePath);
+      const linkStat = await lstat(filePath);
+      const [realRoot, realFilePath] = await Promise.all([
+        realpath(absoluteRoot),
+        realpath(filePath),
+      ]);
+      if (realFilePath !== realRoot && !realFilePath.startsWith(`${realRoot}${path.sep}`)) {
+        respond(response, 403, 'Forbidden');
+        return;
+      }
+
+      const fileStat = linkStat.isSymbolicLink() ? await stat(filePath) : linkStat;
       if (!fileStat.isFile()) {
         respond(response, 404, 'Not Found');
         return;
       }
 
-      const body = await readFile(filePath);
+      const body = await readFile(realFilePath);
       response.writeHead(200, {
         'content-length': body.byteLength,
         'content-type': MIME_TYPES.get(path.extname(filePath).toLowerCase()) ?? 'application/octet-stream',

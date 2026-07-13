@@ -1,7 +1,7 @@
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 import { buildSite } from './build-site.mjs';
 import { createSiteServer } from './serve-site.mjs';
 
@@ -26,6 +26,20 @@ async function close(server) {
   });
 }
 
+async function launchBrowser() {
+  try {
+    return await chromium.launch({ headless: true });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("Executable doesn't exist")) {
+      throw new Error(
+        'Managed Playwright Chromium is not installed. Run `npx playwright install chromium`.',
+        { cause: error },
+      );
+    }
+    throw error;
+  }
+}
+
 export async function renderPdf() {
   await buildSite();
   await mkdir(path.dirname(outputPath), { recursive: true });
@@ -34,7 +48,7 @@ export async function renderPdf() {
   let browser;
   try {
     const port = await listen(server);
-    browser = await chromium.launch({ channel: 'chrome', headless: true });
+    browser = await launchBrowser();
     const page = await browser.newPage();
     await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'domcontentloaded' });
     await page.evaluate(async () => {

@@ -44,7 +44,25 @@ let pdfInfo;
 let pdfText;
 let pdfSize;
 
+async function requirePdfTools(run = execFileAsync) {
+  for (const command of ['pdfinfo', 'pdftotext']) {
+    try {
+      await run(command, ['-v']);
+    } catch (error) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+        throw new Error(
+          `Missing PDF test dependency "${command}". Install Poppler `
+          + '(macOS: `brew install poppler`; Debian/Ubuntu: `apt-get install poppler-utils`).',
+          { cause: error },
+        );
+      }
+      throw error;
+    }
+  }
+}
+
 test.before(async () => {
+  await requirePdfTools();
   await execFileAsync(process.execPath, ['scripts/render-pdf.mjs'], {
     cwd: root,
     maxBuffer: 10 * 1024 * 1024,
@@ -57,6 +75,21 @@ test.before(async () => {
   }));
   pdfText = pdfText.replace(/\s+/g, ' ').trim();
   pdfSize = (await stat(pdfPath)).size;
+});
+
+test('reports an actionable diagnostic when Poppler tools are absent', async () => {
+  for (const missing of ['pdfinfo', 'pdftotext']) {
+    const missingCommand = async (command) => {
+      if (command !== missing) return;
+      const error = new Error('not found');
+      error.code = 'ENOENT';
+      throw error;
+    };
+    await assert.rejects(
+      requirePdfTools(missingCommand),
+      new RegExp(`Missing PDF test dependency "${missing}".*poppler-utils`),
+    );
+  }
 });
 
 test('renders exactly two pages', () => {

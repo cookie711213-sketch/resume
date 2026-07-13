@@ -12,6 +12,7 @@
     "verify": "npm test && npm run build"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.61.1",
+    "linkedom": "^0.18.13"
   }
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
@@ -110,5 +110,29 @@ test('local server serves approved files and rejects unsafe or unknown paths', a
     assert.equal((await request(port, '/..%2fpackage.json')).status, 403);
   } finally {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  }
+});
+
+test('local server rejects symlinks that escape the site root', async () => {
+  await runBuild();
+  const outside = await mkdtemp(path.join(os.tmpdir(), 'resume-server-outside-'));
+  const linkPath = path.join(root, 'site/assets/escape.txt');
+  await writeFile(path.join(outside, 'secret.txt'), 'must not be public');
+  await symlink(path.join(outside, 'secret.txt'), linkPath);
+
+  const { createSiteServer } = await import('../scripts/serve-site.mjs');
+  const server = createSiteServer({ siteRoot: path.join(root, 'site') });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+
+  try {
+    const { port } = server.address();
+    assert.equal((await request(port, '/assets/escape.txt')).status, 403);
+  } finally {
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    await rm(linkPath, { force: true });
+    await rm(outside, { recursive: true, force: true });
   }
 });
