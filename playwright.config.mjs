@@ -1,21 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const projects = [
-  {
+const projects = process.env.CI
+  ? [{
     name: 'chromium',
     use: { ...devices['Desktop Chrome'] },
-  },
-];
-
-if (!process.env.CI) {
-  projects.push({
+  }]
+  : [{
     name: 'chrome',
     use: {
       ...devices['Desktop Chrome'],
       channel: 'chrome',
     },
-  });
-}
+  }];
 
 export default defineConfig({
   testDir: './tests',
